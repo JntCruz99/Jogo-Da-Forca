@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <title>Jogo da forca</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Jogo da forca</h1>
+        <div id="menu" class="menu">
+            <button onclick='start()' id="btnJogar">Jogar</button>
+            <button id="btnConfiguracao">Configurações</button>
+        </div>
+        <div id="jogo" class="jogo inv">
+            <div class="position-relative">
+                <div class="position-absolute top-0 start-0">
+                    <h3 id="score"></h3>
+                </div>
+            </div>
+            <img id="forca" src="img/1.png" width="200px">
+            <div id="dica">
+
+            </div>
+
+        </div>
+        <div id="game-over" class="inv">
+            <h1>GAME-OVER</h1>
+            <button onclick="restart()">TENTAR OUTRA VEZ</button>
+            <a href="index.html"><button>MENU</button></a>
+        </div>
+        <div id="nextLevel" class="inv">
+            <h1>Parabens!!</h1>
+            <h3>Proximo nivel em:</h3>
+            <h4 id="timeout"></h4>
+            <a href="index.html"><button>Sair</button></a>
+        </div>
+    </div>
+</body>
+<script>
+
+    let erros = 1;
+    let palavra = '';
+    let score = 0;
+    function start() {
+
+
+        var menu = $("#menu");
+        var jogo = $("#jogo");
+        var dica = $("#dica");
+        var exibidorletras = $("#exibidor-letras");
+        var scorediv = $("#score")
+        palavra = palavraRadom();
+
+        menu.addClass('inv');
+        jogo.removeClass('inv');
+        dica.append(`<h4>DICA: ${palavra.dica}</h4>`)
+        scorediv.text(`SCORE: ${score}`);
+        dica.append(`<div id="exibidor-letras">
+                        <h1 id="h1">${quatidadeLetras(palavra.palavra)}</h1>
+                    </div>`)
+
+        for (let i = 65; i <= 90; i++) {
+            var letra = String.fromCharCode(i);
+            dica.append(`
+            <button 
+            id='${letra}' 
+            onclick="ativarLetra('${letra}')"
+            >${letra}</button>`);
+        }
+
+    }
+
+    function restart() {
+        var seGanhou = verificarSeGanhou(palavra.palavra);
+        if (seGanhou === true) {
+            score = score + 10;
+        } else {
+            score = 0;
+        }
+
+        erros = 1;
+        $('#forca').attr('src', `img/${erros}.png`);
+
+        $("#game-over").removeClass('game-over');
+        $("#game-over").addClass('inv');
+        $("#dica").empty();
+        palavraPreenchida = [];
+        primeiraRodada = false;
+        start();
+
+    }
+
+    function quatidadeLetras(palavra) {
+        var string = '';
+
+        for (let index = 1; index <= palavra.length; index++) {
+            string += ' __';
+        }
+
+        return string;
+    }
+    function verificarLetra(palavra, letra) {
+        var lista = []
+
+        for (let i = 0; i < palavra.length; i++) {
+            if (palavra[i] === letra) {
+                lista.push(i);
+            }
+        }
+        return lista;
+    }
+    function ativarLetra(letra) {
+        let listaLetras = verificarLetra(palavra.palavra, letra);
+
+        if (listaLetras.length === 0) {
+
+            $(`#${letra}`).addClass('errado');
+            $(`#${letra}`).prop("disabled", true);
+            erros += 1;
+            if (erros < 10) {
+                $('#forca').attr('src', `img/${erros}.png`);
+            } else {
+                $('#forca').attr('src', `img/10.png`);
+                $("#jogo").find("button").prop("disabled", true);
+                $("#game-over").addClass('game-over');
+                $("#game-over").removeClass('inv');
+            }
+        } else {
+            $(`#${letra}`).addClass('certo');
+            $(`#${letra}`).prop("disabled", true);
+            $('#exibidor-letras').empty();
+            $('#exibidor-letras').append(`<h1 id="h1">${preencherLetras(palavra.palavra, letra).join('')}</h1>`)
+            var seGanhou = verificarSeGanhou(palavra.palavra);
+            if (seGanhou === true) {
+                $("#jogo").find("button").prop("disabled", true);
+                $("#nextLevel").removeClass('inv');
+                $("#nextLevel").addClass('nextLevel');
+
+                var segundos = 5;
+                var contadorSegundos = setInterval(function () {
+                    segundos--;
+                    $('#timeout').text(segundos);
+                    if (segundos <= 0) {
+                        clearInterval(contadorSegundos);
+                        $("#nextLevel").removeClass('nextLevel');
+                        $("#nextLevel").addClass('inv');
+                        restart();
+                    }
+                }, 1000);
+            }
+
+        }
+    }
+
+    var palavraPreenchida = [];
+    var primeiraRodada = false;
+    function preencherLetras(palavra, letra) {
+
+        if (typeof palavra === 'string') {
+            palavra = palavra.split('');
+        }
+        palavra.forEach(function (e, indice) {
+            if (letra === e) {
+                palavraPreenchida.splice(indice, 1, letra);
+            } else if (primeiraRodada === false) {
+                palavraPreenchida.splice(indice, 1, ' __');
+            }
+        });
+        primeiraRodada = true;
+        return palavraPreenchida;
+    }
+
+    function verificarSeGanhou(palavra) {
+        if (typeof palavra === 'string') {
+            palavra = palavra.split('');
+        }
+        for (let i = 0; i < palavra.length; i++) {
+            if (palavra[i] !== palavraPreenchida[i]) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+</script>
+<script src="palavraRadom.js"></script>
+
+</html>
