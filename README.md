@@ -24,6 +24,9 @@ Este projeto consiste em um jogo da forca implementado em HTML, CSS e JavaScript
 - O jogador pode reiniciar o jogo a qualquer momento clicando no botão "TENTAR OUTRA VEZ".
 - Se o jogador ganhar, sua pontuação aumentará. Se perder, a pontuação será reiniciada.
 
+## Link para Jogar
+Clique [aqui](https://jntcruz99.github.io/Jogo-Da-Forca/) para jogar o Jogo da Forca.
+
 ## Estrutura do Projeto
 - **HTML**: Define a estrutura do jogo e os elementos visuais.
 - **CSS**: Fornece estilos visuais para os elementos HTML.
@@ -38,3 +41,6 @@ Este projeto consiste em um jogo da forca implementado em HTML, CSS e JavaScript
 ## Bibliotecas Externas Utilizadas
 - **jQuery**: Utilizado para facilitar a manipulação do DOM e simplificar o código JavaScript.
 - **Bootstrap**: Utilizado para aplicar estilos de forma rápida e responsiva aos elementos HTML.
+
+## Considerações Finais
+Este projeto é uma implementação simples do jogo da forca utilizando tecnologias web básicas. Pode ser expandido e melhorado adicionando mais recursos, como múltiplos níveis, pontuação detalhada, animações e efeitos sonoros.
